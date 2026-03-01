@@ -1,7 +1,7 @@
 /// <reference types="vite/client" />
 
 import { initializeApp } from 'firebase/app'
-import { getFirestore, collection, addDoc, query, where, getDocs, updateDoc, doc, onSnapshot } from 'firebase/firestore'
+import { getFirestore, collection, addDoc, query, where, getDocs, updateDoc, doc, onSnapshot, deleteDoc } from 'firebase/firestore'
 import { getAuth } from 'firebase/auth'
 
 // Substitua com suas credenciais do Firebase
@@ -135,6 +135,17 @@ export async function updateTicketStatus(ticketId: string, status: 'called' | 'f
     })
   } catch (error) {
     console.error('Erro ao atualizar ticket:', error)
+    throw error
+  }
+}
+
+export async function deleteTicket(ticketId: string) {
+  try {
+    const ticketRef = doc(db, 'tickets', ticketId)
+    await deleteDoc(ticketRef)
+    console.log('Ticket deletado do Firebase:', ticketId)
+  } catch (error) {
+    console.error('Erro ao deletar ticket:', error)
     throw error
   }
 }

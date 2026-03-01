@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useAppContext } from '../../context/AppContext'
-import { getActiveTickets, updateTicketStatus } from '../../services/firebaseService'
+import { getActiveTickets, updateTicketStatus, deleteTicket } from '../../services/firebaseService'
 import CounterCard from './CounterCard.tsx'
 import CounterDetail from './CounterDetail.tsx'
 
@@ -68,8 +68,30 @@ function AttendantLayout() {
     }
   }
 
-  const handleFinishService = () => {
-    if (selectedCounter?.currentTicket) {
+  const handleFinishService = async () => {
+    if (!selectedCounter?.currentTicket) {
+      return
+    }
+
+    try {
+      // Buscar o ticket no Firebase pelo ticketId para pegar o documento ID
+      const activeTickets = await getActiveTickets()
+      const firebaseTicket = activeTickets.find(
+        t => t.ticketId === selectedCounter.currentTicket!.id
+      )
+
+      if (firebaseTicket && firebaseTicket.id) {
+        // Deletar do Firebase
+        await deleteTicket(firebaseTicket.id)
+        console.log('Ticket finalizado e removido do Firebase')
+      }
+
+      // Atualizar estado local
+      finishServiceAtCounter(selectedCounterId)
+      
+    } catch (error) {
+      console.error('Erro ao finalizar atendimento:', error)
+      // Mesmo com erro, finaliza localmente
       finishServiceAtCounter(selectedCounterId)
     }
   }

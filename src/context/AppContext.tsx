@@ -96,7 +96,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             ...counter.currentTicket,
             finishedAt: new Date()
           }
-          setCallHistory(prev => [finishedTicket, ...prev])
+          // Manter apenas os últimos 3 no histórico
+          setCallHistory(prev => [finishedTicket, ...prev].slice(0, 3))
           return { ...counter, currentTicket: null, isAvailable: true }
         }
         return counter
