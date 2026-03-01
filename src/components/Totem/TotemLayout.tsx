@@ -5,7 +5,7 @@ import { saveTicket } from '../../services/firebaseService'
 type ServiceType = 'G' | 'P' | 'R'
 
 function TotemLayout() {
-  const { callTicketToCounter, counters } = useAppContext()
+  const { counters } = useAppContext()
   const [selectedService, setSelectedService] = useState<ServiceType | null>(null)
   const [issuedTicket, setIssuedTicket] = useState<string | null>(null)
   const [showSuccess, setShowSuccess] = useState(false)
@@ -47,41 +47,31 @@ function TotemLayout() {
     const randomNumber = Math.floor(Math.random() * 1000)
     const newTicketId = `${serviceType}-${String(randomNumber).padStart(3, '0')}`
 
-    // Encontrar guichê disponível do tipo
-    const availableCounter = counters.find(
-      c => c.type === serviceType && c.isAvailable
-    )
+    // Verificar se há guichês do tipo (apenas para mostrar mensagem se não houver nenhum)
+    const hasCounterType = counters.some(c => c.type === serviceType)
 
-    if (availableCounter) {
-      // Objeto para AppContext (estado local)
-      const newTicket = {
-        id: newTicketId,
+    if (!hasCounterType) {
+      alert(`Não há guichês disponíveis para ${serviceType}`)
+      return
+    }
+
+    // Salvar no Firebase (sem atribuir guichê ainda)
+    try {
+      await saveTicket({
+        ticketId: newTicketId,
         category: serviceType,
         number: randomNumber,
-        counter: availableCounter.id,
-        timestamp: new Date()
-      }
-
-      // Salvar no AppContext (estado local)
-      callTicketToCounter(availableCounter.id, newTicket)
+        counter: 0, // Sem guichê atribuído ainda
+        issuedAt: new Date(),
+        status: 'waiting'
+      })
+      console.log('Ticket salvo no Firebase:', newTicketId)
       
-      // Salvar no Firebase (com campos adicionais)
-      try {
-        await saveTicket({
-          ticketId: newTicketId,
-          category: serviceType,
-          number: randomNumber,
-          counter: availableCounter.id,
-          issuedAt: new Date(),
-          status: 'waiting'
-        })
-        console.log('Ticket salvo no Firebase:', newTicketId)
-      } catch (error) {
-        console.error('Erro ao salvar ticket no Firebase:', error)
-      }
-
       setIssuedTicket(newTicketId)
       setShowSuccess(true)
+    } catch (error) {
+      console.error('Erro ao salvar ticket no Firebase:', error)
+      alert('Erro ao gerar senha. Tente novamente.')
     }
   }
 

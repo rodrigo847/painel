@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, useEffect } from 'react'
+import React, { createContext, useState, useContext } from 'react'
 
 export interface Ticket {
   id: string
@@ -43,30 +43,20 @@ interface AppContextType {
 const AppContext = createContext<AppContextType | undefined>(undefined)
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
-  const [currentTicket, setCurrentTicket] = useState<Ticket>({
-    id: 'P-015',
-    category: 'P',
-    number: 15,
-    counter: 3,
-    timestamp: new Date(),
-  })
+  const [currentTicket, setCurrentTicket] = useState<Ticket | null>(null)
 
-  const [recentTickets, setRecentTickets] = useState<Ticket[]>([
-    { id: 'G-014', category: 'G', number: 14, counter: 1, timestamp: new Date(Date.now() - 30000) },
-    { id: 'R-003', category: 'R', number: 3, counter: 7, timestamp: new Date(Date.now() - 60000) },
-    { id: 'P-014', category: 'P', number: 14, counter: 5, timestamp: new Date(Date.now() - 90000) },
-  ])
+  const [recentTickets, setRecentTickets] = useState<Ticket[]>([])
 
   const [queues] = useState({
-    geral: 5,
-    prioritario: 2,
-    retirada: 1,
+    geral: 0,
+    prioritario: 0,
+    retirada: 0,
   })
 
   const [counters, setCounters] = useState<CounterState[]>([
-    { id: 1, type: 'G', currentTicket: { id: 'G-014', category: 'G', number: 14, counter: 1, timestamp: new Date(Date.now() - 30000) }, isAvailable: false },
+    { id: 1, type: 'G', currentTicket: null, isAvailable: true },
     { id: 2, type: 'G', currentTicket: null, isAvailable: true },
-    { id: 3, type: 'P', currentTicket: { id: 'P-015', category: 'P', number: 15, counter: 3, timestamp: new Date() }, isAvailable: false },
+    { id: 3, type: 'P', currentTicket: null, isAvailable: true },
     { id: 4, type: 'P', currentTicket: null, isAvailable: true },
     { id: 5, type: 'R', currentTicket: null, isAvailable: true },
   ])
@@ -113,34 +103,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       })
     )
   }
-
-  // Simulação de chamada de senha a cada 15 segundos
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const categories: Array<'G' | 'P' | 'R'> = ['G', 'P', 'R']
-      const randomCategory = categories[Math.floor(Math.random() * categories.length)]
-      const randomNumber = Math.floor(Math.random() * 100) + 1
-      
-      // Encontrar um balcão disponível do tipo apropriado
-      const availableCounter = counters.find(
-        c => c.type === randomCategory && c.isAvailable
-      )
-      
-      if (availableCounter) {
-        const newTicket: Ticket = {
-          id: `${randomCategory}-${String(randomNumber).padStart(3, '0')}`,
-          category: randomCategory,
-          number: randomNumber,
-          counter: availableCounter.id,
-          timestamp: new Date(),
-        }
-        
-        callTicketToCounter(availableCounter.id, newTicket)
-      }
-    }, 15000)
-
-    return () => clearInterval(interval)
-  }, [counters])
 
   return (
     <AppContext.Provider value={{

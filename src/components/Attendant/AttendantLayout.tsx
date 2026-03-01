@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useAppContext } from '../../context/AppContext'
-import { subscribeToTickets } from '../../services/firebaseService'
+import { getActiveTickets, updateTicketStatus } from '../../services/firebaseService'
 import CounterCard from './CounterCard.tsx'
 import CounterDetail from './CounterDetail.tsx'
 
@@ -8,33 +8,51 @@ function AttendantLayout() {
   const { counters, setCounterAvailability, callTicketToCounter, finishServiceAtCounter, callHistory } = useAppContext()
   const [selectedCounterId, setSelectedCounterId] = useState<number>(1)
 
-  // Sincronizar com Firebase
-  useEffect(() => {
-    const unsubscribe = subscribeToTickets((tickets) => {
-      // Sincronizar tickets com os contadores
-      tickets.forEach(fbTicket => {
-        if (fbTicket.status === 'waiting' || fbTicket.status === 'called') {
-          // Buscar se o ticket já está no AppContext
-          const counter = counters.find(c => c.id === fbTicket.counter)
-          if (counter && !counter.currentTicket) {
-            // Adicionar ticket ao contador se não tem nenhum
-            const newTicket = {
-              id: fbTicket.ticketId,
-              category: fbTicket.category,
-              number: fbTicket.number,
-              counter: fbTicket.counter,
-              timestamp: fbTicket.issuedAt
-            }
-            callTicketToCounter(fbTicket.counter, newTicket)
-          }
-        }
-      })
-    })
-
-    return () => unsubscribe()
-  }, [counters, callTicketToCounter])
-
   const selectedCounter = counters.find(c => c.id === selectedCounterId)
+
+  const handleCallNext = async () => {
+    if (!selectedCounter || !selectedCounter.isAvailable || selectedCounter.currentTicket) {
+      return
+    }
+
+    try {
+      // Buscar tickets em espera do tipo correto
+      const activeTickets = await getActiveTickets()
+      const waitingTickets = activeTickets.filter(
+        t => t.status === 'waiting' && t.category === selectedCounter.type
+      )
+
+      if (waitingTickets.length === 0) {
+        alert('Não há senhas em espera para este tipo de atendimento')
+        return
+      }
+
+      // Pegar o primeiro da fila (mais antigo)
+      const nextTicket = waitingTickets.sort((a, b) => 
+        a.issuedAt.getTime() - b.issuedAt.getTime()
+      )[0]
+
+      // Atualizar no Firebase
+      await updateTicketStatus(nextTicket.id!, 'called', {
+        counter: selectedCounterId,
+        calledAt: new Date()
+      })
+
+      // Atualizar no AppContext
+      const ticket = {
+        id: nextTicket.ticketId,
+        category: nextTicket.category,
+        number: nextTicket.number,
+        counter: selectedCounterId,
+        timestamp: new Date()
+      }
+      callTicketToCounter(selectedCounterId, ticket)
+      
+    } catch (error) {
+      console.error('Erro ao chamar próxima senha:', error)
+      alert('Erro ao chamar próxima senha')
+    }
+  }
 
   const handleToggleAvailability = () => {
     if (selectedCounter) {
@@ -97,6 +115,7 @@ function AttendantLayout() {
             {selectedCounter && (
               <CounterDetail
                 counter={selectedCounter}
+                onCallNext={handleCallNext}
                 onFinish={handleFinishService}
               />
             )}
