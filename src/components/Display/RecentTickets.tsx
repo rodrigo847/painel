@@ -20,10 +20,10 @@ const getCategoryEmoji = (category: 'G' | 'P' | 'R') => {
 export default function RecentTickets({ tickets }: { tickets: Ticket[] }) {
   return (
     <div className="text-white">
-      <h2 className="text-2xl font-bold mb-3">📋 ÚLTIMAS CHAMADAS</h2>
-      <div className="space-y-2">
+      <h2 className="text-lg md:text-xl lg:text-2xl font-bold mb-2 md:mb-3">📋 ÚLTIMAS CHAMADAS</h2>
+      <div className="space-y-1 md:space-y-2">
         {tickets.map((ticket, index) => (
-          <div key={index} className="flex items-center justify-between p-2 bg-gray-700 rounded text-lg">
+          <div key={index} className="flex items-center justify-between p-2 md:p-3 bg-gray-700 rounded text-sm md:text-base lg:text-lg">
             <span>{getCategoryEmoji(ticket.category)} {ticket.id}</span>
             <span>→ Guichê {ticket.counter}</span>
           </div>

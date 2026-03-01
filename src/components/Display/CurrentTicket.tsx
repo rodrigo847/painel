@@ -43,10 +43,10 @@ export default function CurrentTicket({ ticket }: { ticket: Ticket }) {
   return (
     <div className={`current-ticket bg-gradient-to-br ${getCategoryColor(ticket.category)}`}>
       <div className="text-white">
-        <p className="text-3xl mb-2">{getCategoryEmoji(ticket.category)} SENHA ATUAL</p>
-        <div className="ticket-number my-6">{ticket.id}</div>
-        <p className="text-4xl font-bold mb-2">GUICHÊ {ticket.counter}</p>
-        <p className="text-2xl opacity-90">{getCategoryName(ticket.category)}</p>
+        <p className="text-lg md:text-2xl lg:text-3xl mb-2">{getCategoryEmoji(ticket.category)} SENHA ATUAL</p>
+        <div className="ticket-number my-3 md:my-4 lg:my-6">{ticket.id}</div>
+        <p className="text-2xl md:text-3xl lg:text-4xl font-bold mb-2">GUICHÊ {ticket.counter}</p>
+        <p className="text-lg md:text-xl lg:text-2xl opacity-90">{getCategoryName(ticket.category)}</p>
       </div>
     </div>
   )
