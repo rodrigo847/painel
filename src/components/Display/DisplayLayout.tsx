@@ -11,7 +11,7 @@ export default function DisplayLayout() {
     <div className="display-container">
       {/* Área de Senhas - 70% */}
       <div className="ticket-panel">
-        <CurrentTicket ticket={currentTicket} />
+        {currentTicket && <CurrentTicket ticket={currentTicket} />}
         <RecentTickets tickets={recentTickets} />
         <QueueCounter queues={queues} />
       </div>
