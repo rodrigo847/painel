@@ -35,10 +35,10 @@ function TotemLayout() {
       description: 'Gestantes, idosos, deficientes'
     },
     R: {
-      label: 'Retirada de Documentos',
+      label: 'Retirada de Pedidos',
       icon: '📋',
       color: 'from-green-600 to-green-800',
-      description: 'Retirada de solicitações'
+      description: 'Tenha o número para facilitar a entrega'
     }
   }
 
