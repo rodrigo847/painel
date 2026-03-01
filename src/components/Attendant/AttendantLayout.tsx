@@ -1,11 +1,38 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAppContext } from '../../context/AppContext'
+import { subscribeToTickets } from '../../services/firebaseService'
 import CounterCard from './CounterCard.tsx'
 import CounterDetail from './CounterDetail.tsx'
 
 function AttendantLayout() {
   const { counters, setCounterAvailability, callTicketToCounter, finishServiceAtCounter, callHistory } = useAppContext()
   const [selectedCounterId, setSelectedCounterId] = useState<number>(1)
+
+  // Sincronizar com Firebase
+  useEffect(() => {
+    const unsubscribe = subscribeToTickets((tickets) => {
+      // Sincronizar tickets com os contadores
+      tickets.forEach(fbTicket => {
+        if (fbTicket.status === 'waiting' || fbTicket.status === 'called') {
+          // Buscar se o ticket já está no AppContext
+          const counter = counters.find(c => c.id === fbTicket.counter)
+          if (counter && !counter.currentTicket) {
+            // Adicionar ticket ao contador se não tem nenhum
+            const newTicket = {
+              id: fbTicket.ticketId,
+              category: fbTicket.category,
+              number: fbTicket.number,
+              counter: fbTicket.counter,
+              timestamp: fbTicket.issuedAt
+            }
+            callTicketToCounter(fbTicket.counter, newTicket)
+          }
+        }
+      })
+    })
+
+    return () => unsubscribe()
+  }, [counters, callTicketToCounter])
 
   const selectedCounter = counters.find(c => c.id === selectedCounterId)
 
