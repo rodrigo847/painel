@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAppContext } from '../../context/AppContext'
 import { getActiveTickets, updateTicketStatus, deleteTicket } from '../../services/firebaseService'
 import CounterCard from './CounterCard.tsx'
@@ -7,25 +7,47 @@ import CounterDetail from './CounterDetail.tsx'
 function AttendantLayout() {
   const { counters, setCounterAvailability, callTicketToCounter, finishServiceAtCounter, callHistory } = useAppContext()
   const [selectedCounterId, setSelectedCounterId] = useState<number>(1)
+  const [waitingQueues, setWaitingQueues] = useState<{ G: number; P: number; R: number }>({ G: 0, P: 0, R: 0 })
+
+  // Buscar fila de espera em tempo real
+  useEffect(() => {
+    const fetchQueues = async () => {
+      try {
+        const activeTickets = await getActiveTickets()
+        const queues = { G: 0, P: 0, R: 0 }
+        
+        activeTickets.forEach(ticket => {
+          if (ticket.status === 'waiting') {
+            queues[ticket.category]++
+          }
+        })
+        
+        setWaitingQueues(queues)
+      } catch (error) {
+        console.error('Erro ao buscar filas:', error)
+      }
+    }
+
+    fetchQueues()
+    // Buscar a cada 2 segundos
+    const interval = setInterval(fetchQueues, 2000)
+    return () => clearInterval(interval)
+  }, [])
 
   const selectedCounter = counters.find(c => c.id === selectedCounterId)
 
   const handleCallNext = async () => {
     if (!selectedCounter || !selectedCounter.isAvailable || selectedCounter.currentTicket) {
-      console.log('Guichê não disponível:', { selectedCounter, isAvailable: selectedCounter?.isAvailable, hasTicket: !!selectedCounter?.currentTicket })
       return
     }
 
     try {
-      console.log('Buscando tickets no Firebase...')
       // Buscar tickets em espera do tipo correto
       const activeTickets = await getActiveTickets()
-      console.log('Tickets ativos:', activeTickets)
       
       const waitingTickets = activeTickets.filter(
         t => t.status === 'waiting' && t.category === selectedCounter.type
       )
-      console.log('Tickets em espera do tipo', selectedCounter.type, ':', waitingTickets)
 
       if (waitingTickets.length === 0) {
         alert('Não há senhas em espera para este tipo de atendimento')
@@ -36,14 +58,12 @@ function AttendantLayout() {
       const nextTicket = waitingTickets.sort((a, b) => 
         a.issuedAt.getTime() - b.issuedAt.getTime()
       )[0]
-      console.log('Próximo ticket:', nextTicket)
 
       // Atualizar no Firebase
       await updateTicketStatus(nextTicket.id!, 'called', {
         counter: selectedCounterId,
         calledAt: new Date()
       })
-      console.log('Status atualizado no Firebase')
 
       // Atualizar no AppContext
       const ticket = {
@@ -54,7 +74,6 @@ function AttendantLayout() {
         timestamp: new Date()
       }
       callTicketToCounter(selectedCounterId, ticket)
-      console.log('Ticket chamado com sucesso!')
       
     } catch (error) {
       console.error('Erro ao chamar próxima senha:', error)
@@ -83,7 +102,6 @@ function AttendantLayout() {
       if (firebaseTicket && firebaseTicket.id) {
         // Deletar do Firebase
         await deleteTicket(firebaseTicket.id)
-        console.log('Ticket finalizado e removido do Firebase')
       }
 
       // Atualizar estado local
@@ -102,6 +120,30 @@ function AttendantLayout() {
         {/* Header */}
         <div className="mb-4">
           <h1 className="text-2xl font-bold mb-3">Gerenciador de Guichês</h1>
+          
+          {/* Fila de Espera */}
+          <div className="grid grid-cols-3 gap-3 mb-4">
+            {/* Geral */}
+            <div className="bg-blue-900 rounded-lg p-3 border-2 border-blue-600">
+              <div className="text-sm text-blue-300 mb-1">👤 Geral</div>
+              <div className="text-3xl font-bold text-white">{waitingQueues.G}</div>
+              <div className="text-xs text-blue-400">em espera</div>
+            </div>
+            
+            {/* Prioritário */}
+            <div className="bg-red-900 rounded-lg p-3 border-2 border-red-600">
+              <div className="text-sm text-red-300 mb-1">⭐ Prioritário</div>
+              <div className="text-3xl font-bold text-white">{waitingQueues.P}</div>
+              <div className="text-xs text-red-400">em espera</div>
+            </div>
+            
+            {/* Retirada */}
+            <div className="bg-green-900 rounded-lg p-3 border-2 border-green-600">
+              <div className="text-sm text-green-300 mb-1">📋 Retirada</div>
+              <div className="text-3xl font-bold text-white">{waitingQueues.R}</div>
+              <div className="text-xs text-green-400">em espera</div>
+            </div>
+          </div>
           
           {/* Status do Guichê Selecionado */}
           {selectedCounter && (

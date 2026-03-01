@@ -107,7 +107,6 @@ export async function getActiveTickets() {
         status: data.status
       }
     }) as TicketData[]
-    console.log('Tickets ativos encontrados:', tickets)
     return tickets
   } catch (error) {
     console.error('Erro ao buscar tickets ativos:', error)
@@ -150,7 +149,6 @@ export async function deleteTicket(ticketId: string) {
   try {
     const ticketRef = doc(db, 'tickets', ticketId)
     await deleteDoc(ticketRef)
-    console.log('Ticket deletado do Firebase:', ticketId)
   } catch (error) {
     console.error('Erro ao deletar ticket:', error)
     throw error

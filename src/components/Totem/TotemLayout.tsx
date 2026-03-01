@@ -65,7 +65,6 @@ function TotemLayout() {
         issuedAt: new Date(),
         status: 'waiting'
       })
-      console.log('Ticket salvo no Firebase:', newTicketId)
       
       setIssuedTicket(newTicketId)
       setShowSuccess(true)
