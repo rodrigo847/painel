@@ -103,15 +103,15 @@ function TotemLayout() {
   if (selectedService) {
     const info = serviceInfo[selectedService]
     return (
-      <div className="w-full h-full bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center p-4">
-        <div className="text-center max-w-2xl">
-          <button
-            onClick={() => setSelectedService(null)}
-            className="absolute top-4 left-4 px-6 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg font-bold transition-colors"
-          >
-            ← Voltar
-          </button>
+      <div className="w-full h-full bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center p-4 relative">
+        <button
+          onClick={() => setSelectedService(null)}
+          className="absolute top-6 left-6 px-8 py-4 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold text-2xl transition-all transform hover:scale-110 active:scale-95 shadow-lg border-2 border-red-400"
+        >
+          ← VOLTAR
+        </button>
 
+        <div className="text-center max-w-2xl">
           <div className={`text-9xl mb-6`}>{info.icon}</div>
           <h1 className="text-5xl font-bold text-white mb-2">{info.label}</h1>
           <p className="text-2xl text-gray-300 mb-12">{info.description}</p>
@@ -125,6 +125,7 @@ function TotemLayout() {
 
           <div className="mt-12 text-gray-400">
             <p className="text-xl">Clique no botão para emitir sua senha</p>
+            <p className="text-sm mt-2 opacity-50">Se errar, clique em VOLTAR no canto superior esquerdo</p>
           </div>
         </div>
       </div>
