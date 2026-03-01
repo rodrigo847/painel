@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useAppContext } from '../../context/AppContext'
-import { saveTicket } from '../../services/firebaseService'
+import { saveTicket, getNextTicketNumber } from '../../services/firebaseService'
 
 type ServiceType = 'G' | 'P' | 'R'
 
@@ -43,10 +43,6 @@ function TotemLayout() {
   }
 
   const handleIssueTicket = async (serviceType: ServiceType) => {
-    // Gerar número aleatório
-    const randomNumber = Math.floor(Math.random() * 1000)
-    const newTicketId = `${serviceType}-${String(randomNumber).padStart(3, '0')}`
-
     // Verificar se há guichês do tipo (apenas para mostrar mensagem se não houver nenhum)
     const hasCounterType = counters.some(c => c.type === serviceType)
 
@@ -57,10 +53,14 @@ function TotemLayout() {
 
     // Salvar no Firebase (sem atribuir guichê ainda)
     try {
+      // Buscar próximo número sequencial
+      const nextNumber = await getNextTicketNumber(serviceType)
+      const newTicketId = `${serviceType}-${String(nextNumber).padStart(3, '0')}`
+      
       await saveTicket({
         ticketId: newTicketId,
         category: serviceType,
-        number: randomNumber,
+        number: nextNumber,
         counter: 0, // Sem guichê atribuído ainda
         issuedAt: new Date(),
         status: 'waiting'

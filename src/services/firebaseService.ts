@@ -42,6 +42,29 @@ export interface CounterData {
 }
 
 // ============== TICKETS ==============
+export async function getNextTicketNumber(category: 'G' | 'P' | 'R') {
+  try {
+    // Buscar todos os tickets dessa categoria
+    const q = query(
+      collection(db, 'tickets'),
+      where('category', '==', category)
+    )
+    const docs = await getDocs(q)
+    
+    if (docs.empty) {
+      return 1 // Primeira senha
+    }
+    
+    // Encontrar o maior número
+    const numbers = docs.docs.map(doc => doc.data().number as number)
+    const maxNumber = Math.max(...numbers)
+    return maxNumber + 1
+  } catch (error) {
+    console.error('Erro ao buscar próximo número:', error)
+    return Math.floor(Math.random() * 1000) // Fallback para aleatório
+  }
+}
+
 export async function saveTicket(ticket: TicketData) {
   try {
     const docRef = await addDoc(collection(db, 'tickets'), {
