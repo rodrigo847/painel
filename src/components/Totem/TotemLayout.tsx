@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useAppContext } from '../../context/AppContext'
+import { saveTicket } from '../../services/firebaseService'
 
 type ServiceType = 'G' | 'P' | 'R'
 
@@ -41,7 +42,7 @@ function TotemLayout() {
     }
   }
 
-  const handleIssueTicket = (serviceType: ServiceType) => {
+  const handleIssueTicket = async (serviceType: ServiceType) => {
     // Gerar número aleatório
     const randomNumber = Math.floor(Math.random() * 1000)
     const newTicketId = `${serviceType}-${String(randomNumber).padStart(3, '0')}`
@@ -52,6 +53,7 @@ function TotemLayout() {
     )
 
     if (availableCounter) {
+      // Objeto para AppContext (estado local)
       const newTicket = {
         id: newTicketId,
         category: serviceType,
@@ -60,7 +62,24 @@ function TotemLayout() {
         timestamp: new Date()
       }
 
+      // Salvar no AppContext (estado local)
       callTicketToCounter(availableCounter.id, newTicket)
+      
+      // Salvar no Firebase (com campos adicionais)
+      try {
+        await saveTicket({
+          ticketId: newTicketId,
+          category: serviceType,
+          number: randomNumber,
+          counter: availableCounter.id,
+          issuedAt: new Date(),
+          status: 'waiting'
+        })
+        console.log('Ticket salvo no Firebase:', newTicketId)
+      } catch (error) {
+        console.error('Erro ao salvar ticket no Firebase:', error)
+      }
+
       setIssuedTicket(newTicketId)
       setShowSuccess(true)
     }

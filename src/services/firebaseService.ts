@@ -1,5 +1,7 @@
+/// <reference types="vite/client" />
+
 import { initializeApp } from 'firebase/app'
-import { getFirestore, collection, addDoc, query, where, getDocs, updateDoc, doc, onSnapshot, deleteDoc } from 'firebase/firestore'
+import { getFirestore, collection, addDoc, query, where, getDocs, updateDoc, doc, onSnapshot } from 'firebase/firestore'
 import { getAuth } from 'firebase/auth'
 
 // Substitua com suas credenciais do Firebase
@@ -78,13 +80,11 @@ export async function getTicketHistory(limit = 100) {
       where('status', '==', 'finished')
     )
     const docs = await getDocs(q)
-    return docs.docs
-      .map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      })) as TicketData[]
-      .sort((a, b) => (b.finishedAt?.getTime() || 0) - (a.finishedAt?.getTime() || 0))
-      .slice(0, limit)
+    const tickets = docs.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    })) as TicketData[]
+    return tickets.sort((a, b) => (b.finishedAt?.getTime() || 0) - (a.finishedAt?.getTime() || 0)).slice(0, limit)
   } catch (error) {
     console.error('Erro ao buscar histórico:', error)
     return []
