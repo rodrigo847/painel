@@ -44,12 +44,6 @@ function AttendantLayout() {
       return
     }
 
-    // Apenas guichê 5 pode chamar Retirada
-    if (selectedServiceType === 'R' && selectedCounterId !== 5) {
-      alert('Apenas o Guichê 5 pode chamar senhas de Retirada')
-      return
-    }
-
     try {
       // Buscar tickets em espera do tipo escolhido
       const activeTickets = await getActiveTickets()
@@ -199,18 +193,9 @@ function AttendantLayout() {
                   ⭐ Prioritário
                 </button>
                 <button
-                  onClick={() => {
-                    if (selectedCounterId === 5) {
-                      setSelectedServiceType('R')
-                    } else {
-                      alert('Apenas Guichê 5 pode atender Retirada')
-                    }
-                  }}
-                  disabled={selectedCounterId !== 5}
+                  onClick={() => setSelectedServiceType('R')}
                   className={`flex-1 py-2 rounded-lg font-bold transition-colors ${
-                    selectedCounterId !== 5
-                      ? 'bg-gray-700 text-gray-500 cursor-not-allowed border-2 border-gray-600'
-                      : selectedServiceType === 'R'
+                    selectedServiceType === 'R'
                       ? 'bg-green-600 text-white border-2 border-green-400'
                       : 'bg-gray-700 text-gray-300 hover:bg-gray-600 border-2 border-gray-600'
                   }`}
