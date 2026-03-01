@@ -63,10 +63,22 @@ export async function getActiveTickets() {
       where('status', 'in', ['waiting', 'called'])
     )
     const docs = await getDocs(q)
-    return docs.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    })) as TicketData[]
+    const tickets = docs.docs.map(doc => {
+      const data = doc.data()
+      return {
+        id: doc.id,
+        ticketId: data.ticketId,
+        category: data.category,
+        number: data.number,
+        counter: data.counter,
+        issuedAt: data.issuedAt?.toDate ? data.issuedAt.toDate() : new Date(data.issuedAt),
+        calledAt: data.calledAt?.toDate ? data.calledAt.toDate() : data.calledAt ? new Date(data.calledAt) : undefined,
+        finishedAt: data.finishedAt?.toDate ? data.finishedAt.toDate() : data.finishedAt ? new Date(data.finishedAt) : undefined,
+        status: data.status
+      }
+    }) as TicketData[]
+    console.log('Tickets ativos encontrados:', tickets)
+    return tickets
   } catch (error) {
     console.error('Erro ao buscar tickets ativos:', error)
     return []

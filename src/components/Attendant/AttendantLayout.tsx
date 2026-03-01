@@ -12,15 +12,20 @@ function AttendantLayout() {
 
   const handleCallNext = async () => {
     if (!selectedCounter || !selectedCounter.isAvailable || selectedCounter.currentTicket) {
+      console.log('Guichê não disponível:', { selectedCounter, isAvailable: selectedCounter?.isAvailable, hasTicket: !!selectedCounter?.currentTicket })
       return
     }
 
     try {
+      console.log('Buscando tickets no Firebase...')
       // Buscar tickets em espera do tipo correto
       const activeTickets = await getActiveTickets()
+      console.log('Tickets ativos:', activeTickets)
+      
       const waitingTickets = activeTickets.filter(
         t => t.status === 'waiting' && t.category === selectedCounter.type
       )
+      console.log('Tickets em espera do tipo', selectedCounter.type, ':', waitingTickets)
 
       if (waitingTickets.length === 0) {
         alert('Não há senhas em espera para este tipo de atendimento')
@@ -31,12 +36,14 @@ function AttendantLayout() {
       const nextTicket = waitingTickets.sort((a, b) => 
         a.issuedAt.getTime() - b.issuedAt.getTime()
       )[0]
+      console.log('Próximo ticket:', nextTicket)
 
       // Atualizar no Firebase
       await updateTicketStatus(nextTicket.id!, 'called', {
         counter: selectedCounterId,
         calledAt: new Date()
       })
+      console.log('Status atualizado no Firebase')
 
       // Atualizar no AppContext
       const ticket = {
@@ -47,6 +54,7 @@ function AttendantLayout() {
         timestamp: new Date()
       }
       callTicketToCounter(selectedCounterId, ticket)
+      console.log('Ticket chamado com sucesso!')
       
     } catch (error) {
       console.error('Erro ao chamar próxima senha:', error)
