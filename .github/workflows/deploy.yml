@@ -31,6 +31,13 @@ jobs:
         run: npm ci
 
       - name: Build
+        env:
+          VITE_FIREBASE_API_KEY: AIzaSyCezp2ELbQ9_bogHkpFiZMo6PcwfCkekHE
+          VITE_FIREBASE_AUTH_DOMAIN: painel-7a228.firebaseapp.com
+          VITE_FIREBASE_PROJECT_ID: painel-7a228
+          VITE_FIREBASE_STORAGE_BUCKET: painel-7a228.firebasestorage.app
+          VITE_FIREBASE_MESSAGING_SENDER_ID: 931196087668
+          VITE_FIREBASE_APP_ID: 1:931196087668:web:40927637b78cb5a8805021
         run: npm run build
 
       - name: Setup Pages
