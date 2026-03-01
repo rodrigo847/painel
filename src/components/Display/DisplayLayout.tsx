@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
-import CurrentTicket from './CurrentTicket'
-import RecentTickets from './RecentTickets'
-import QueueCounter from './QueueCounter'
-import MediaPanel from './MediaPanel'
+import CurrentTicket from './CurrentTicket.tsx'
+import RecentTickets from './RecentTickets.tsx'
+import QueueCounter from './QueueCounter.tsx'
+import MediaPanel from './MediaPanel.tsx'
 
 interface Ticket {
   id: string
@@ -27,7 +27,7 @@ export default function DisplayLayout() {
     { id: 'P-014', category: 'P', number: 14, counter: 5, timestamp: new Date(Date.now() - 90000) },
   ])
 
-  const [queues, setQueues] = useState({
+  const [queues] = useState({
     geral: 5,
     prioritario: 2,
     retirada: 1,
