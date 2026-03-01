@@ -155,9 +155,6 @@ function TotemLayout() {
               <div className="text-7xl mb-4">{info.icon}</div>
               <h2 className="text-3xl mb-2">{info.label}</h2>
               <p className="text-lg opacity-90 mb-4">{info.description}</p>
-              <div className="bg-black/30 rounded-lg py-3 mt-4">
-                <p className="text-2xl font-black">{availableCount} Guichê{availableCount !== 1 ? 's' : ''}</p>
-              </div>
             </button>
           )
         })}
