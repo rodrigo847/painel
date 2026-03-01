@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useAppContext } from '../../context/AppContext'
-import CounterCard from './CounterCard'
-import CounterDetail from './CounterDetail'
+import CounterCard from './CounterCard.tsx'
+import CounterDetail from './CounterDetail.tsx'
 
 function AttendantLayout() {
   const { counters, setCounterAvailability, callTicketToCounter, finishServiceAtCounter, callHistory } = useAppContext()
