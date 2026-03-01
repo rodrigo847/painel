@@ -24,11 +24,6 @@ interface AppContextType {
   currentTicket: Ticket | null
   setCurrentTicket: (ticket: Ticket) => void
   recentTickets: Ticket[]
-  queues: {
-    geral: number
-    prioritario: number
-    retirada: number
-  }
   
   // Counters
   counters: CounterState[]
@@ -46,12 +41,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [currentTicket, setCurrentTicket] = useState<Ticket | null>(null)
 
   const [recentTickets, setRecentTickets] = useState<Ticket[]>([])
-
-  const [queues] = useState({
-    geral: 0,
-    prioritario: 0,
-    retirada: 0,
-  })
 
   const [counters, setCounters] = useState<CounterState[]>([
     { id: 1, type: 'G', currentTicket: null, isAvailable: true },
@@ -110,7 +99,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       currentTicket,
       setCurrentTicket,
       recentTickets,
-      queues,
       counters,
       setCounterAvailability,
       callTicketToCounter,
