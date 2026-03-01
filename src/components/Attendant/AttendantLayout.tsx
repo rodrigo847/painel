@@ -42,25 +42,6 @@ function AttendantLayout() {
     }
   }
 
-  const handleCallNext = () => {
-    if (selectedCounter && selectedCounter.isAvailable) {
-      const types: Array<'G' | 'P' | 'R'> = ['G', 'P', 'R']
-      const randomType = types[Math.floor(Math.random() * types.length)]
-      const randomNumber = Math.floor(Math.random() * 1000)
-      
-      const newTicket = {
-        number: randomNumber,
-        type: randomType,
-        id: `${randomType}-${String(randomNumber).padStart(3, '0')}`,
-        category: randomType as 'G' | 'P' | 'R',
-        counter: selectedCounterId,
-        timestamp: new Date()
-      }
-      
-      callTicketToCounter(selectedCounterId, newTicket)
-    }
-  }
-
   const handleFinishService = () => {
     if (selectedCounter?.currentTicket) {
       finishServiceAtCounter(selectedCounterId)
@@ -116,7 +97,6 @@ function AttendantLayout() {
             {selectedCounter && (
               <CounterDetail
                 counter={selectedCounter}
-                onCallNext={handleCallNext}
                 onFinish={handleFinishService}
               />
             )}

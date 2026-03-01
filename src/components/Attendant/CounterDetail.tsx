@@ -2,11 +2,10 @@ import { CounterState } from '../../context/AppContext'
 
 interface CounterDetailProps {
   counter: CounterState
-  onCallNext: () => void
   onFinish: () => void
 }
 
-function CounterDetail({ counter, onCallNext, onFinish }: CounterDetailProps) {
+function CounterDetail({ counter, onFinish }: CounterDetailProps) {
   const getCategoryColor = (category: string) => {
     switch (category) {
       case 'P':
@@ -74,22 +73,11 @@ function CounterDetail({ counter, onCallNext, onFinish }: CounterDetailProps) {
       )}
 
       {/* Actions */}
-      <div className="grid grid-cols-2 gap-3 mt-4">
-        <button
-          onClick={onCallNext}
-          disabled={!counter.isAvailable || counter.currentTicket !== null}
-          className={`px-4 py-3 rounded-lg font-bold text-base transition-colors border-2 ${
-            !counter.isAvailable || counter.currentTicket
-              ? 'bg-gray-700 text-gray-500 cursor-not-allowed border-gray-600'
-              : 'bg-blue-600 hover:bg-blue-700 text-white border-blue-500'
-          }`}
-        >
-          📢 Chamar
-        </button>
+      <div className="w-full">
         <button
           onClick={onFinish}
           disabled={!counter.currentTicket}
-          className={`px-4 py-3 rounded-lg font-bold text-base transition-colors border-2 ${
+          className={`w-full px-4 py-3 rounded-lg font-bold text-base transition-colors border-2 ${
             !counter.currentTicket
               ? 'bg-gray-700 text-gray-500 cursor-not-allowed border-gray-600'
               : 'bg-green-600 hover:bg-green-700 text-white border-green-500'
