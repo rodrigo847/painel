@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import DisplayLayout from './components/Display/DisplayLayout'
 import AttendantLayout from './components/Attendant/AttendantLayout'
+import TotemLayout from './components/Totem/TotemLayout'
 import './App.css'
 
 function App() {
@@ -48,14 +49,7 @@ function App() {
       <div className="h-[calc(100vh-60px)] overflow-hidden">
         {currentPage === 'display' && <DisplayLayout />}
         {currentPage === 'attendant' && <AttendantLayout />}
-        {currentPage === 'totem' && (
-          <div className="w-full h-full flex items-center justify-center bg-gray-900 text-white">
-            <div className="text-center">
-              <h1 className="text-4xl font-bold mb-4">📱 Totem de Emissão</h1>
-              <p className="text-2xl">Em desenvolvimento...</p>
-            </div>
-          </div>
-        )}
+        {currentPage === 'totem' && <TotemLayout />}
       </div>
     </div>
   )
