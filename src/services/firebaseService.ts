@@ -44,10 +44,11 @@ export interface CounterData {
 // ============== TICKETS ==============
 export async function getNextTicketNumber(category: 'G' | 'P' | 'R') {
   try {
-    // Buscar todos os tickets dessa categoria
+    // Buscar apenas tickets ativos (não finalizados/deletados) dessa categoria
     const q = query(
       collection(db, 'tickets'),
-      where('category', '==', category)
+      where('category', '==', category),
+      where('status', 'in', ['waiting', 'called'])
     )
     const docs = await getDocs(q)
     
@@ -58,6 +59,12 @@ export async function getNextTicketNumber(category: 'G' | 'P' | 'R') {
     // Encontrar o maior número
     const numbers = docs.docs.map(doc => doc.data().number as number)
     const maxNumber = Math.max(...numbers)
+    
+    // Se chegou a 100, reinicia em 1
+    if (maxNumber >= 100) {
+      return 1
+    }
+    
     return maxNumber + 1
   } catch (error) {
     console.error('Erro ao buscar próximo número:', error)
