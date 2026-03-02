@@ -1,10 +1,4 @@
-interface Ticket {
-  id: string
-  category: 'G' | 'P' | 'R'
-  number: number
-  counter: number
-  timestamp: Date
-}
+import { Ticket } from '../../context/AppContext'
 
 const getCategoryEmoji = (category: 'G' | 'P' | 'R') => {
   switch (category) {
@@ -24,7 +18,7 @@ export default function RecentTickets({ tickets }: { tickets: Ticket[] }) {
       <div className="space-y-1 md:space-y-2">
         {tickets.map((ticket, index) => (
           <div key={index} className="flex items-center justify-between p-2 md:p-3 bg-gray-700 rounded text-sm md:text-base lg:text-lg">
-            <span>{getCategoryEmoji(ticket.category)} {ticket.id}</span>
+            <span>{getCategoryEmoji(ticket.category)} {ticket.ticketId}</span>
             <span>→ Guichê {ticket.counter}</span>
           </div>
         ))}

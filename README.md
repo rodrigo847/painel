@@ -550,23 +550,24 @@ npm install node-thermal-printer
 
 ### Exemplo de Código
 
-```typescript
-import { ThermalPrinter, PrinterTypes } from 'node-thermal-printer';
+Use o serviço wrapper que já está integrado:
 
-const printer = new ThermalPrinter({
-  type: PrinterTypes.EPSON,
-  interface: 'tcp://192.168.1.100'
+```typescript
+import { printTicket, getPrinterStatus } from './services/printer';
+
+// Simplesmente chame:
+const success = await printTicket({
+  category: 'Atendimento Geral',
+  number: '001',
+  timestamp: new Date()
 });
 
-async function printTicket(category: string, number: string) {
-  printer.alignCenter();
-  printer.setTextSize(2, 2);
-  printer.println('SENHA');
-  printer.setTextSize(3, 3);
-  printer.println(`${category}-${number}`);
-  printer.cut();
-  await printer.execute();
-}
+console.log(`Status: ${getPrinterStatus()}`);
+```
+
+**Configuração do IP**: Edite o arquivo `.env`:
+```env
+VITE_PRINTER_INTERFACE=tcp://192.168.3.38
 ```
 
 ## 📝 Notas Finais

@@ -1,10 +1,4 @@
-interface Ticket {
-  id: string
-  category: 'G' | 'P' | 'R'
-  number: number
-  counter: number
-  timestamp: Date
-}
+import { Ticket } from '../../context/AppContext'
 
 const getCategoryColor = (category: 'G' | 'P' | 'R') => {
   switch (category) {
@@ -44,7 +38,7 @@ export default function CurrentTicket({ ticket }: { ticket: Ticket }) {
     <div className={`current-ticket bg-gradient-to-br ${getCategoryColor(ticket.category)}`}>
       <div className="text-white">
         <p className="text-lg md:text-2xl lg:text-3xl mb-2">{getCategoryEmoji(ticket.category)} SENHA ATUAL</p>
-        <div className="ticket-number my-3 md:my-4 lg:my-6">{ticket.id}</div>
+        <div className="ticket-number my-3 md:my-4 lg:my-6">{ticket.ticketId}</div>
         <p className="text-2xl md:text-3xl lg:text-4xl font-bold mb-2">GUICHÊ {ticket.counter}</p>
         <p className="text-lg md:text-xl lg:text-2xl opacity-90">{getCategoryName(ticket.category)}</p>
       </div>

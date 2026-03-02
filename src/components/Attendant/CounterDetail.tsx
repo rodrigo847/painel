@@ -58,15 +58,15 @@ function CounterDetail({ counter, onCallNext, onFinish }: CounterDetailProps) {
           {/* Info */}
           <div className="text-center mb-4">
             <div className="text-gray-400 mb-1 text-sm">Guichê</div>
-            <div className="text-4xl font-black text-blue-400">{String(counter.id).padStart(2, '0')}</div>
+            <div className="text-4xl font-black text-blue-400">{String(counter.counterId).padStart(2, '0')}</div>
           </div>
 
           {/* Tempo */}
-          {counter.currentTicket.timestamp && (
+          {counter.currentTicket.calledAt && (
             <div className="text-center text-gray-400">
               <div className="text-xs">Chamado às</div>
               <div className="text-base font-mono">
-                {counter.currentTicket.timestamp.toLocaleTimeString('pt-BR')}
+                {new Date(counter.currentTicket.calledAt).toLocaleTimeString('pt-BR')}
               </div>
             </div>
           )}

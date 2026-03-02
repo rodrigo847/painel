@@ -1,116 +1,46 @@
-import { useEffect } from 'react'
-import { useAppContext } from '../context/AppContext'
-import { 
-  saveTicket, 
-  updateTicketStatus, 
-  subscribeToTickets,
-  updateCounterState,
-  subscribeToCounters
-} from '../services/firebaseService'
+/**
+ * Sincronização com Firebase
+ * 
+ * NOTA: A sincronização em tempo real agora é feita no AppContext.tsx
+ * Este arquivo mantém hooks úteis para sincronização manual se necessário.
+ */
 
-export function useFirebaseSync() {
+import { useAppContext } from '../context/AppContext'
+
+/**
+ * Hook para obter status de sincronização
+ * Útil para mostrar indicadores de carregamento
+ */
+export function useSyncStatus() {
+  const { isInitialized } = useAppContext()
+
+  return {
+    isInitialized,
+    isSyncing: !isInitialized
+  }
+}
+
+/**
+ * Hook para obter dados sincronizados do Firebase
+ * Todos os dados já estão sincronizados automaticamente no AppContext
+ */
+export function useFirestoreData() {
   const { 
     currentTicket, 
-    counters, 
-    callHistory 
+    recentTickets,
+    counters,
+    callHistory,
+    isInitialized 
   } = useAppContext()
 
-  // Sincronizar senhas com Firebase
-  useEffect(() => {
-    if (!currentTicket) return
-
-    const syncTicket = async () => {
-      try {
-        // Salvar nova senha
-        await saveTicket({
-          ticketId: currentTicket.id,
-          category: currentTicket.category,
-          number: currentTicket.number,
-          counter: currentTicket.counter,
-          issuedAt: currentTicket.timestamp,
-          status: 'called'
-        })
-      } catch (error) {
-        console.error('Erro ao sincronizar senha:', error)
-      }
-    }
-
-    syncTicket()
-  }, [currentTicket])
-
-  // Sincronizar histórico com Firebase
-  useEffect(() => {
-    if (callHistory.length === 0) return
-
-    const lastTicket = callHistory[0]
-    const syncHistory = async () => {
-      try {
-        // Atualizar status para finished
-        const ticketRef = lastTicket.id || `${lastTicket.category}-${lastTicket.number}`
-        await updateTicketStatus(ticketRef, 'finished', {
-          finishedAt: lastTicket.finishedAt
-        })
-      } catch (error) {
-        console.error('Erro ao sincronizar histórico:', error)
-      }
-    }
-
-    if (lastTicket.finishedAt) {
-      syncHistory()
-    }
-  }, [callHistory])
-
-  // Sincronizar estado dos guichês
-  useEffect(() => {
-    const syncCounters = async () => {
-      try {
-        for (const counter of counters) {
-          await updateCounterState(counter.id, {
-            counterId: counter.id,
-            type: counter.type as 'G' | 'P' | 'R',
-            isAvailable: counter.isAvailable,
-            currentTicketId: counter.currentTicket?.id
-          })
-        }
-      } catch (error) {
-        console.error('Erro ao sincronizar guichês:', error)
-      }
-    }
-
-    const timer = setTimeout(syncCounters, 1000) // Sincronizar a cada 1 segundo
-    return () => clearTimeout(timer)
-  }, [counters])
+  return {
+    currentTicket,
+    recentTickets,
+    counters,
+    callHistory,
+    isInitialized
+  }
 }
 
-// Hook para escutar atualizações do Firebase em tempo real
-export function useFirestoreListener() {
-  const { setCurrentTicket } = useAppContext()
+export default useFirestoreData
 
-  useEffect(() => {
-    const unsubscribeTickets = subscribeToTickets((tickets) => {
-      // Encontrar a senha mais recente com status 'called'
-      const calledTicket = tickets
-        .filter(t => t.status === 'called')
-        .sort((a, b) => new Date(b.issuedAt).getTime() - new Date(a.issuedAt).getTime())[0]
-
-      if (calledTicket) {
-        setCurrentTicket({
-          id: calledTicket.ticketId,
-          category: calledTicket.category,
-          number: calledTicket.number,
-          counter: calledTicket.counter,
-          timestamp: new Date(calledTicket.issuedAt)
-        })
-      }
-    })
-
-    const unsubscribeCounters = subscribeToCounters(() => {
-      // Atualizar estado dos contadores conforme necessário
-    })
-
-    return () => {
-      unsubscribeTickets()
-      unsubscribeCounters()
-    }
-  }, [setCurrentTicket])
-}

@@ -37,7 +37,7 @@ function AttendantLayout() {
     return () => clearInterval(interval)
   }, [])
 
-  const selectedCounter = counters.find(c => c.id === selectedCounterId)
+  const selectedCounter = counters.find(c => c.counterId === selectedCounterId)
 
   const handleCallNext = async () => {
     if (!selectedCounter || !selectedCounter.isAvailable || selectedCounter.currentTicket) {
@@ -70,13 +70,16 @@ function AttendantLayout() {
 
       // Atualizar no AppContext
       const ticket = {
-        id: nextTicket.ticketId,
+        id: nextTicket.id,
+        ticketId: nextTicket.ticketId,
         category: nextTicket.category,
         number: nextTicket.number,
         counter: selectedCounterId,
-        timestamp: new Date()
+        issuedAt: nextTicket.issuedAt,
+        status: 'called' as const,
+        calledAt: new Date()
       }
-      callTicketToCounter(selectedCounterId, ticket)
+      await callTicketToCounter(selectedCounterId, ticket)
       
     } catch (error) {
       console.error('Erro ao chamar próxima senha:', error)
@@ -84,9 +87,9 @@ function AttendantLayout() {
     }
   }
 
-  const handleToggleAvailability = () => {
+  const handleToggleAvailability = async () => {
     if (selectedCounter) {
-      setCounterAvailability(selectedCounterId, !selectedCounter.isAvailable)
+      await setCounterAvailability(selectedCounterId, !selectedCounter.isAvailable)
     }
   }
 
@@ -108,12 +111,12 @@ function AttendantLayout() {
       }
 
       // Atualizar estado local
-      finishServiceAtCounter(selectedCounterId)
+      await finishServiceAtCounter(selectedCounterId)
       
     } catch (error) {
       console.error('Erro ao finalizar atendimento:', error)
       // Mesmo com erro, finaliza localmente
-      finishServiceAtCounter(selectedCounterId)
+      await finishServiceAtCounter(selectedCounterId)
     }
   }
 
@@ -154,7 +157,7 @@ function AttendantLayout() {
               <div className="flex items-center gap-4 mb-4">
                 <div>
                   <span className="text-gray-400 text-sm">Guichê Selecionado:</span>
-                  <div className="text-3xl font-bold text-blue-400">{String(selectedCounter.id).padStart(2, '0')}</div>
+                  <div className="text-3xl font-bold text-blue-400">{String(selectedCounter.counterId).padStart(2, '0')}</div>
                 </div>
                 <div className="ml-auto">
                   <button
@@ -213,10 +216,10 @@ function AttendantLayout() {
           <div className="col-span-1 flex flex-col gap-2 overflow-y-auto">
             {counters.map(counter => (
               <CounterCard
-                key={counter.id}
+                key={counter.counterId}
                 counter={counter}
-                isSelected={selectedCounterId === counter.id}
-                onClick={() => setSelectedCounterId(counter.id)}
+                isSelected={selectedCounterId === counter.counterId}
+                onClick={() => setSelectedCounterId(counter.counterId)}
               />
             ))}
           </div>

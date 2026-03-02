@@ -2,6 +2,7 @@ import { useState } from 'react'
 import DisplayLayout from './components/Display/DisplayLayout'
 import AttendantLayout from './components/Attendant/AttendantLayout'
 import TotemLayout from './components/Totem/TotemLayout'
+import PrinterStatus from './components/PrinterStatus'
 import './App.css'
 
 function App() {
@@ -51,6 +52,9 @@ function App() {
         {currentPage === 'attendant' && <AttendantLayout />}
         {currentPage === 'totem' && <TotemLayout />}
       </div>
+
+      {/* Status da Impressora */}
+      <PrinterStatus />
     </div>
   )
 }

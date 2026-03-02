@@ -31,7 +31,7 @@ function CounterCard({ counter, isSelected, onClick }: CounterCardProps) {
       }`}
     >
       <div className="flex items-center justify-between mb-2">
-        <div className="text-lg font-bold">#{String(counter.id).padStart(2, '0')}</div>
+        <div className="text-lg font-bold">#{String(counter.counterId).padStart(2, '0')}</div>
         <div className={`text-xs px-2 py-1 rounded font-bold ${
           counter.isAvailable
             ? 'bg-green-600/50 text-green-300'

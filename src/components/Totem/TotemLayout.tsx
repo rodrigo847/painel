@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useAppContext } from '../../context/AppContext'
 import { saveTicket, getNextTicketNumber } from '../../services/firebaseService'
+import { printTicket as printerPrintTicket, getPrinterStatus } from '../../services/printer'
 
 type ServiceType = 'G' | 'P' | 'R'
 
@@ -9,6 +10,8 @@ function TotemLayout() {
   const [selectedService, setSelectedService] = useState<ServiceType | null>(null)
   const [issuedTicket, setIssuedTicket] = useState<string | null>(null)
   const [showSuccess, setShowSuccess] = useState(false)
+  const [isPrinting, setIsPrinting] = useState(false)
+  const [printerError, setPrinterError] = useState<string | null>(null)
 
   useEffect(() => {
     if (issuedTicket && showSuccess) {
@@ -67,9 +70,33 @@ function TotemLayout() {
       })
       
       setIssuedTicket(newTicketId)
+      setPrinterError(null)
+      
+      // Tentar imprimir o ticket
+      setIsPrinting(true)
+      const categoryMap: Record<ServiceType, string> = {
+        G: 'Atendimento Geral',
+        P: 'Prioritário',
+        R: 'Retirada'
+      }
+      
+      const printed = await printerPrintTicket({
+        category: categoryMap[serviceType],
+        number: String(nextNumber).padStart(3, '0'),
+        timestamp: new Date()
+      })
+      
+      if (!printed) {
+        setPrinterError('Erro ao imprimir. Verifique a impressora.')
+        console.warn(`Impressora desconectada. Status: ${getPrinterStatus()}`)
+      }
+      
+      setIsPrinting(false)
       setShowSuccess(true)
     } catch (error) {
       console.error('Erro ao salvar ticket no Firebase:', error)
+      setIsPrinting(false)
+      setPrinterError('Erro ao gerar senha. Tente novamente.')
       alert('Erro ao gerar senha. Tente novamente.')
     }
   }
@@ -92,6 +119,25 @@ function TotemLayout() {
             {issuedTicket}
           </div>
           <p className="text-2xl text-white mb-4">Aguarde sua chamada no painel</p>
+          
+          {isPrinting && (
+            <div className="text-lg text-yellow-300 animate-pulse mb-4">
+              🖨️ Imprimindo ticket...
+            </div>
+          )}
+          
+          {printerError && (
+            <div className="text-lg text-red-300 mb-4 bg-red-900 p-4 rounded-lg">
+              ⚠️ {printerError}
+            </div>
+          )}
+          
+          {!isPrinting && !printerError && (
+            <div className="text-lg text-green-300 mb-4">
+              ✓ Ticket impresso com sucesso
+            </div>
+          )}
+          
           <div className="text-lg text-gray-200 animate-pulse">
             Retornando ao menu em alguns segundos...
           </div>
@@ -144,7 +190,6 @@ function TotemLayout() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl w-full">
         {(['G', 'P', 'R'] as ServiceType[]).map(serviceType => {
           const info = serviceInfo[serviceType]
-          const availableCount = counters.filter(c => c.type === serviceType && c.isAvailable).length
 
           return (
             <button
