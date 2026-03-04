@@ -1,8 +1,13 @@
 /// <reference types="vite/client" />
 
-import { initializeApp } from 'firebase/app'
-import { getFirestore, collection, addDoc, query, where, getDocs, updateDoc, doc, onSnapshot, deleteDoc } from 'firebase/firestore'
-import { getAuth } from 'firebase/auth'
+import { initializeApp, FirebaseApp } from 'firebase/app'
+import { getFirestore, collection, addDoc, query, where, getDocs, updateDoc, doc, onSnapshot, deleteDoc, Firestore } from 'firebase/firestore'
+import { getAuth, Auth } from 'firebase/auth'
+
+// Verificar variáveis de ambiente
+console.log('🔧 Firebase Service: Inicializando...')
+console.log('API Key disponível:', !!import.meta.env.VITE_FIREBASE_API_KEY)
+console.log('Project ID:', import.meta.env.VITE_FIREBASE_PROJECT_ID)
 
 // Substitua com suas credenciais do Firebase
 const firebaseConfig = {
@@ -14,10 +19,33 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID || '',
 }
 
+console.log('🔥 Firebase Config:', {
+  projectId: firebaseConfig.projectId,
+  authDomain: firebaseConfig.authDomain,
+  hasApiKey: !!firebaseConfig.apiKey
+})
+
+if (!firebaseConfig.projectId) {
+  console.error('❌ ERRO: Firebase Project ID não configurado!')
+  console.error('Verifique as variáveis de ambiente VITE_FIREBASE_*')
+}
+
 // Inicializar Firebase
-const app = initializeApp(firebaseConfig)
-export const db = getFirestore(app)
-export const auth = getAuth(app)
+let app: FirebaseApp
+let db: Firestore
+let auth: Auth
+
+try {
+  app = initializeApp(firebaseConfig)
+  db = getFirestore(app)
+  auth = getAuth(app)
+  console.log('✅ Firebase inicializado com sucesso')
+} catch (error) {
+  console.error('❌ Erro ao inicializar Firebase:', error)
+  throw error
+}
+
+export { db, auth }
 
 // ============== TIPOS ==============
 export interface TicketData {

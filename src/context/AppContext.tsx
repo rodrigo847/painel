@@ -8,6 +8,8 @@ import {
 } from '../services/firebaseService'
 import type { TicketData, CounterData } from '../services/firebaseService'
 
+console.log('🔧 AppContext: Iniciando contexto...')
+
 export interface Ticket extends TicketData {
   id?: string
 }

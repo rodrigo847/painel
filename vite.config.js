@@ -2,11 +2,11 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 export default defineConfig({
     plugins: [react()],
-    base: '/painel/',
+    base: '/', // Firebase Hosting serve da raiz
     server: {
         port: 5173,
         host: 'localhost',
-        open: true,
+        open: false,
         strictPort: false
     },
     build: {
