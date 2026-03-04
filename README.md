@@ -1,5 +1,32 @@
 # 📞 Painel de Chamada de Senhas
 
+> Sistema completo para gerenciamento de filas de atendimento com impressão térmica e sincronização em tempo real
+
+[![Deploy](https://img.shields.io/badge/Deploy-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com)
+[![Firebase](https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)](https://firebase.google.com)
+[![React](https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev)
+[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org)
+
+## 🚀 Deploy Rápido
+
+**Status:** ✅ Pronto para deploy online
+
+- **Repositório:** https://github.com/rodrigo847/painel
+- **Deploy Frontend:** [Guia Vercel](DEPLOY_VERCEL.md) (5 minutos)
+- **Servidor de Impressão:** [Documentação](server/README.md)
+
+## ✨ Funcionalidades
+
+✅ **Emissão de Senhas** - Sistema totem com impressão térmica  
+✅ **Chamada Automática** - Interface de atendente intuitiva  
+✅ **Display em Tempo Real** - Painel de exibição sincronizado  
+✅ **Firebase Realtime** - Sincronização instantânea entre dispositivos  
+✅ **Impressora Epson TM-T20X** - Integração completa via API  
+✅ **3 Tipos de Atendimento** - Geral, Prioritário e Retirada  
+✅ **Sistema Responsivo** - Funciona em tablets, TVs e desktops
+
+---
+
 Um aplicativo para gerenciar e chamar senhas em filas de atendimento. Sistema simples e intuitivo para organizar o fluxo de clientes, com design moderno inspirado em painéis de cartórios.
 
 ## �️ Arquitetura do Sistema
@@ -189,63 +216,105 @@ Sistema de retirada de senhas com 3 categorias distintas:
 
 ## 🛠️ Tecnologias
 
-### Software
+### Frontend
+- **Framework**: React 18 + TypeScript
+- **Build Tool**: Vite 5
+- **Styling**: Tailwind CSS 3
+- **State Management**: React Context API
+- **Banco de Dados**: Firebase Firestore (tempo real)
 
-- **Runtime**: Node.js
-- **Linguagem**: TypeScript
-- **Frontend**: HTML5 + Tailwind CSS
-- **Build Tool**: Vite
-- **Banco de Dados**: Firebase (sincronização em tempo real)
-- **Impressão**: Driver ESC/POS para Epson TM-T20X
+### Backend (Servidor de Impressão)
+- **Runtime**: Node.js 18+
+- **Framework**: Express.js
+- **Impressão**: node-thermal-printer
+- **CORS**: Habilitado para requisições cross-origin
 
 ### Hardware
-
-- **Totem**: Tablet (recomendado 10" ou maior)
-- **Impressora**: Epson TM-T20X (térmica 80mm)
-- **Painel**: TV/Monitor Full HD ou 4K
-- **Atendentes**: Computador/Tablet por guichê
-
-### Bibliotecas Necessárias
-
-- `escpos` ou `node-thermal-printer` - Comunicação com impressora
-- `firebase/firestore` - Sincronização em tempo real
-- `react-query` - Gerenciamento de estado
+- **Totem**: Tablet/PC (recomendado 10" ou maior)
+- **Impressora**: Epson TM-T20X (térmica 80mm, TCP/IP ou USB)
+- **Painel**: TV/Monitor Full HD (1920x1080)
+- **Atendentes**: PC/Tablet por guichê
 
 ## 📦 Instalação
 
+### Frontend (React)
 ```bash
 # Clonar repositório
-git clone <seu-repositorio>
-
-# Entrar no diretório
-cd Painel_senha
+git clone https://github.com/rodrigo847/painel.git
+cd painel
 
 # Instalar dependências
 npm install
 
-# Instalar Tailwind CSS
-npm install -D tailwindcss postcss autoprefixer
-npx tailwindcss init -p
+# Copiar e configurar .env
+cp .env.example .env
+# Editar .env com suas credenciais do Firebase
 
-# Instalar bibliotecas para impressora
-npm install node-thermal-printer
+# Iniciar em desenvolvimento
+npm run dev
+```
 
-# Instalar Firebase
-npm install firebase
+### Servidor de Impressão (Node.js)
+```bash
+# Na pasta server
+cd server
+
+# Instalar dependências
+npm install
+
+# Iniciar servidor
+npm start
+```
+
+### Início Rápido (Windows)
+```powershell
+# Inicia tudo automaticamente
+.\start.bat
 ```
 
 ## 🚀 Como Usar
 
-```bash
-# Iniciar servidor de desenvolvimento
-npm run dev
+### Desenvolvimento Local
 
-# Build para produção
+```bash
+# Iniciar frontend (Terminal 1)
+npm run dev
+# Acesso: http://localhost:5173/painel/
+
+# Iniciar servidor de impressão (Terminal 2)
+cd server
+npm start
+# API: http://localhost:3001
+```
+
+### URLs de Acesso
+
+- **📱 Totem** (Emissão): `http://localhost:5173/painel/totem`
+- **💻 Guichê** (Atendente): `http://localhost:5173/painel/attendant`
+- **📺 Display** (Painel): `http://localhost:5173/painel/display`
+
+### Build para Produção
+
+```bash
+# Build do frontend
 npm run build
 
 # Preview da build
 npm run preview
+
+# Testar impressora
+cd server
+npm run test:printer
 ```
+
+## 📖 Documentação
+
+- **[GUIA_RAPIDO.md](GUIA_RAPIDO.md)** - Guia completo de uso do sistema
+- **[DEPLOY_VERCEL.md](DEPLOY_VERCEL.md)** - Deploy rápido na Vercel (5 min)
+- **[DEPLOY.md](DEPLOY.md)** - Todas as opções de deploy
+- **[server/README.md](server/README.md)** - Documentação do servidor de impressão
+- **[FIREBASE_SETUP.md](FIREBASE_SETUP.md)** - Configuração do Firebase
+- **[PRINTER_SETUP.md](PRINTER_SETUP.md)** - Configuração da impressora
 
 ## 📂 Estrutura do Projeto
 
