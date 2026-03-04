@@ -62,13 +62,7 @@ function AttendantLayout() {
         a.issuedAt.getTime() - b.issuedAt.getTime()
       )[0]
 
-      // Atualizar no Firebase
-      await updateTicketStatus(nextTicket.id!, 'called', {
-        counter: selectedCounterId,
-        calledAt: new Date()
-      })
-
-      // Atualizar no AppContext
+      // Criar objeto do ticket completo
       const ticket = {
         id: nextTicket.id,
         ticketId: nextTicket.ticketId,
@@ -79,7 +73,11 @@ function AttendantLayout() {
         status: 'called' as const,
         calledAt: new Date()
       }
+      
+      // Atualizar no AppContext (que já atualiza o Firebase)
       await callTicketToCounter(selectedCounterId, ticket)
+      
+      console.log('✅ Senha chamada:', ticket.ticketId, 'para guichê', selectedCounterId)
       
     } catch (error) {
       console.error('Erro ao chamar próxima senha:', error)
@@ -99,15 +97,12 @@ function AttendantLayout() {
     }
 
     try {
-      // Buscar o ticket no Firebase pelo ticketId para pegar o documento ID
-      const activeTickets = await getActiveTickets()
-      const firebaseTicket = activeTickets.find(
-        t => t.ticketId === selectedCounter.currentTicket!.id
-      )
-
-      if (firebaseTicket && firebaseTicket.id) {
+      // Buscar o ticket no Firebase usando o ID do documento
+      const currentTicketId = selectedCounter.currentTicket.id
+      
+      if (currentTicketId) {
         // Deletar do Firebase
-        await deleteTicket(firebaseTicket.id)
+        await deleteTicket(currentTicketId)
       }
 
       // Atualizar estado local

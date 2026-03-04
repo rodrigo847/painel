@@ -36,17 +36,27 @@ class EpsonPrinter {
   }
 
   /**
-   * Conecta à impressora
+   * Conecta à impressora via API do servidor
    */
   async connect(): Promise<boolean> {
     try {
-      console.log('Conectando à impressora Epson TM-T20X...');
-      // Implementação da conexão será feita com a biblioteca node-thermal-printer
-      this.isConnected = true;
-      console.log('Impressora conectada com sucesso!');
-      return true;
+      console.log('Verificando conexão com servidor de impressão...');
+      const serverUrl = import.meta.env.VITE_PRINTER_SERVER_URL || 'http://localhost:3001';
+      
+      const response = await fetch(`${serverUrl}/status`);
+      const data = await response.json();
+      
+      this.isConnected = data.connected;
+      
+      if (this.isConnected) {
+        console.log('✅ Servidor de impressão conectado!');
+      } else {
+        console.warn('⚠️ Servidor de impressão não conectado à impressora');
+      }
+      
+      return this.isConnected;
     } catch (error) {
-      console.error('Erro ao conectar impressora:', error);
+      console.error('❌ Erro ao conectar com servidor de impressão:', error);
       this.isConnected = false;
       return false;
     }
@@ -65,33 +75,37 @@ class EpsonPrinter {
   }
 
   /**
-   * Imprime um ticket de senha
+   * Imprime um ticket de senha via API do servidor de impressão
    */
   async printTicket(ticket: TicketData): Promise<boolean> {
-    if (!this.isConnected) {
-      const connected = await this.connect();
-      if (!connected) {
-        throw new Error('Não foi possível conectar à impressora');
-      }
-    }
-
     try {
-      console.log('Imprimindo ticket:', ticket);
+      console.log('Enviando ticket para impressão:', ticket);
       
-      // Simulação da impressão enquanto não instala a biblioteca
-      // Implementação real será feita com node-thermal-printer
-      const ticketContent = this.generateTicketContent(ticket);
+      const serverUrl = import.meta.env.VITE_PRINTER_SERVER_URL || 'http://localhost:3001';
       
-      console.log('Conteúdo do ticket:\n', ticketContent);
+      const response = await fetch(`${serverUrl}/print`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(ticket),
+      });
+
+      const result = await response.json();
       
-      // TODO: Chamar printer.execute() com a biblioteca real
-      
-      // Reproduzir som de impressão
-      this.playPrintSound();
-      
-      return true;
+      if (response.ok && result.success) {
+        console.log('✅ Ticket impresso com sucesso');
+        this.playPrintSound();
+        this.isConnected = true;
+        return true;
+      } else {
+        console.error('❌ Erro ao imprimir:', result.error || result.message);
+        this.isConnected = false;
+        return false;
+      }
     } catch (error) {
-      console.error('Erro ao imprimir ticket:', error);
+      console.error('❌ Erro ao conectar com servidor de impressão:', error);
+      this.isConnected = false;
       return false;
     }
   }

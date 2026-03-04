@@ -51,7 +51,7 @@ function CounterDetail({ counter, onCallNext, onFinish }: CounterDetailProps) {
           <div className={`border-4 rounded-2xl px-8 py-6 mb-4 ${getCategoryColor(counter.currentTicket.category)}`}>
             <div className="text-center">
               <div className="text-4xl mb-2">{getCategoryEmoji(counter.currentTicket.category)}</div>
-              <div className="text-6xl font-black tracking-wider text-white">{counter.currentTicket.id}</div>
+              <div className="text-6xl font-black tracking-wider text-white">{counter.currentTicket.ticketId}</div>
             </div>
           </div>
 
