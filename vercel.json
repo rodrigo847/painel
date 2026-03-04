@@ -1,0 +1,48 @@
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "framework": "vite",
+  "installCommand": "npm install",
+  "devCommand": "npm run dev",
+  "routes": [
+    {
+      "src": "/painel/totem",
+      "dest": "/painel/index.html"
+    },
+    {
+      "src": "/painel/attendant",
+      "dest": "/painel/index.html"
+    },
+    {
+      "src": "/painel/display",
+      "dest": "/painel/index.html"
+    },
+    {
+      "src": "/painel/(.*)",
+      "dest": "/painel/index.html"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/painel/index.html"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        }
+      ]
+    }
+  ]
+}
