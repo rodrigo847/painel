@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useAppContext } from '../../context/AppContext'
-import { getActiveTickets, updateTicketStatus, deleteTicket } from '../../services/firebaseService'
+import { getActiveTickets, deleteTicket } from '../../services/firebaseService'
 import CounterCard from './CounterCard.tsx'
 import CounterDetail from './CounterDetail.tsx'
 

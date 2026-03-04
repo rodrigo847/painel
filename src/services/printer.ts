@@ -110,33 +110,7 @@ class EpsonPrinter {
     }
   }
 
-  /**
-   * Gera o conteúdo formatado do ticket
-   */
-  private generateTicketContent(ticket: TicketData): string {
-    const date = ticket.timestamp || new Date();
-    const timeString = date.toLocaleTimeString('pt-BR');
-    const dateString = date.toLocaleDateString('pt-BR');
 
-    let content = '';
-    content += '============================\n';
-    content += '          SENHA\n';
-    content += '============================\n\n';
-    content += `Categoria: ${ticket.category}\n`;
-    content += `Número: ${ticket.number}\n`;
-    content += `Data: ${dateString}\n`;
-    content += `Hora: ${timeString}\n`;
-    
-    if (ticket.guiche) {
-      content += `\nGuichê: ${ticket.guiche}\n`;
-    }
-    
-    content += '\n============================\n';
-    content += 'Obrigado por aguardar!\n';
-    content += '============================\n';
-
-    return content;
-  }
 
   /**
    * Reproduz som de impressão
